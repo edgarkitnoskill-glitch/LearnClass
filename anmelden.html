@@ -1,0 +1,211 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+
+<head>
+    <meta charset="UTF-8">
+
+    <title>LearnClass - Anmelden</title>
+
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🎓 LearnClass</h1>
+
+        <h2>Anmelden</h2>
+
+        <p>Erstelle dein LearnClass-Konto.</p>
+
+        <!-- Anmeldung -->
+
+        <form id="anmeldung">
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Deine E-Mail"
+                required
+            >
+
+            <input
+                type="password"
+                id="passwort"
+                placeholder="Passwort"
+                required
+            >
+
+            <input
+                type="password"
+                id="passwortWiederholen"
+                placeholder="Passwort wiederholen"
+                required
+            >
+
+            <button type="submit">
+                📧 PIN anfordern
+            </button>
+
+            <button onclick="window.location.href='index.html'">
+                ❌ Zurück
+            </button>
+
+        </form>
+
+
+        <!-- PIN-Bereich -->
+
+        <div id="pinBereich" style="display: none;">
+
+            <h2>📧 E-Mail bestätigen</h2>
+
+            <p>
+                Gib den PIN ein, den du per E-Mail erhalten hast.
+            </p>
+
+            <input
+                type="text"
+                id="pin"
+                placeholder="PIN eingeben"
+                maxlength="6"
+            >
+
+            <button onclick="pinPruefen()">
+                ✅ PIN prüfen
+            </button>
+
+            <p id="meldung"></p>
+
+        </div>
+
+    </div>
+
+
+    <script>
+
+const anmeldung = document.getElementById("anmeldung");
+
+const pinBereich = document.getElementById("pinBereich");
+
+
+anmeldung.addEventListener("submit", async function(event) {
+
+    event.preventDefault();
+
+    const email = document.getElementById("email").value;
+
+    const passwort = document.getElementById("passwort").value;
+
+    const passwortWiederholen =
+        document.getElementById("passwortWiederholen").value;
+
+
+    if (passwort !== passwortWiederholen) {
+
+        alert("Die Passwörter stimmen nicht überein!");
+
+        return;
+
+    }
+
+
+    if (passwort.length < 8) {
+
+        alert("Das Passwort muss mindestens 8 Zeichen haben!");
+
+        return;
+
+    }
+
+
+    try {
+
+        const antwort = await fetch("/register", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+
+                email: email,
+
+                password: passwort
+
+            })
+
+        });
+
+
+        const daten = await antwort.json();
+
+
+        if (!antwort.ok) {
+
+            alert(daten.message);
+
+            return;
+
+        }
+
+
+        alert("Konto erfolgreich erstellt! 🎓");
+
+        anmeldung.style.display = "none";
+
+        pinBereich.style.display = "block";
+
+
+    } catch (error) {
+
+        alert("Server nicht erreichbar!");
+
+        console.error(error);
+
+    }
+
+});
+
+
+// PIN prüfen – Demo
+function pinPruefen() {
+
+    const pin = document.getElementById("pin").value;
+
+    const meldung = document.getElementById("meldung");
+
+
+    if (pin === "123456") {
+
+        meldung.innerText =
+            "✅ PIN richtig! Weiter zu LearnClass...";
+
+        meldung.style.color = "green";
+
+
+        setTimeout(function() {
+
+            window.location.href = "index.html";
+
+        }, 1500);
+
+
+    } else {
+
+        meldung.innerText = "❌ Falscher PIN!";
+
+        meldung.style.color = "red";
+
+    }
+
+}
+
+</script>
+
+</body>
+
+</html>

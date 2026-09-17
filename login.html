@@ -1,0 +1,163 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>LearnClass - Login</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h1>🎓 LearnClass</h1>
+
+        <h2>Willkommen zurück!</h2>
+
+        <p>Melde dich bei deinem Account an.</p>
+
+
+        <form id="loginForm">
+            
+            <input
+               type="text"
+                id="nickname"
+                placeholder="Dein Spitzname"
+                required
+                minlength="2"
+                maxlength="20"
+            >
+            
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Deine E-Mail"
+                required
+            >
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Dein Passwort"
+                required
+            >
+
+            <button type="submit">
+                🔐 Anmelden
+            </button>
+
+        </form>
+
+
+        <p id="meldung"></p>
+
+
+        <button
+            type="button"
+            onclick="window.location.href='anmelden.html'"
+        >
+            📝 Noch kein Konto?
+        </button>
+
+    </div>
+
+
+    <script>
+
+        const loginForm =
+            document.getElementById("loginForm");
+
+
+        loginForm.addEventListener("submit", async function(event) {
+
+            event.preventDefault();
+
+            const nickname = 
+                document.getElementById("nickname").value;
+
+            const email =
+                document.getElementById("email").value;
+
+            const password =
+                document.getElementById("password").value;
+
+
+            try {
+
+                const antwort = await fetch("/login", {
+
+                    method: "POST",
+
+                    headers: {
+
+                        "Content-Type": "application/json"
+
+                    },
+
+                    body: JSON.stringify({
+
+                        email: email,
+
+                        password: password
+
+                    })
+
+                });
+
+
+                const daten = await antwort.json();
+
+
+                if (!antwort.ok) {
+
+                    document.getElementById("meldung").innerText =
+                        "❌ " + daten.message;
+
+                    return;
+
+                }
+
+
+                // Login erfolgreich
+                localStorage.setItem(
+                    "learnclassNickname",
+                    nickname
+                )
+
+                localStorage.setItem(
+                    "learnclassEmail",
+                    email
+                );
+
+
+                document.getElementById("meldung").innerText =
+                    "✅ Erfolgreich angemeldet!";
+
+
+                setTimeout(function() {
+
+                    window.location.href = "index.html";
+
+                }, 1000);
+
+
+            } catch (error) {
+
+                document.getElementById("meldung").innerText =
+                    "❌ Server nicht erreichbar!";
+
+            }
+
+        });
+
+    </script>
+
+</body>
+
+</html>

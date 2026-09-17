@@ -1,0 +1,97 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <title>LearnClass</title>
+
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+    <header class="navbar">
+
+        <div class="logo">
+        🎓 LearnClass
+        </div>
+
+        <div class="account-area">
+
+            <button
+                id="accountButton"
+                onclick="toggleAccount()"
+            >
+            🔐 Anmelden
+            </button>
+
+            <div
+                id="accountMenu"
+                class="account-menu"
+                style="display: none;"
+            >
+
+                <h3>👤 Mein Account</h3>
+
+                <p id="accountEmail">
+                    Nicht angemeldet
+                </p>
+
+                <button onclick="abmelden()">
+                    🚪 Abmelden
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+
+    <div class="container">
+
+        <h1>🎓 LearnClass</h1>
+
+        <p>
+            Lernen. Gemeinsam. Einfach.
+        </p>
+
+        <button onclick="window.location.href='login.html'">
+            🔐 Anmelden
+        </button>
+
+        <button>
+            🏫 Klasse erstellen
+        </button>
+
+        <button>
+            📚 Klasse beitreten
+        </button>
+
+    </div>
+
+    <script>
+    const email = localStorage.getItem("learnclassNickname");
+
+    if (email) {
+        const info = document.createElement("div");
+
+        info.innerHTML = `
+           <p>✅ Angemeldet als: <b>${email}</b></p>
+           <button onclick="abmelden()">🚪 Abmelden</button>
+        `;
+
+        info.className = "account-info";
+        document.body.prepend(info);
+    }
+
+    function abmelden() {
+        localStorage.removeItem("learnclassNickname");
+        window.location.href = "index.html";
+    }
+    </script>
+
+</body>
+
+</html>
