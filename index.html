@@ -1,97 +1,396 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="de">
 
 <head>
-
     <meta charset="UTF-8">
-
     <title>LearnClass</title>
-
     <link rel="stylesheet" href="style.css">
-
 </head>
 
 <body>
-    <header class="navbar">
 
-        <div class="logo">
+<header class="navbar">
+
+    <div class="logo">
         🎓 LearnClass
-        </div>
+    </div>
 
-        <div class="account-area">
+    <div class="account-area">
 
-            <button
-                id="accountButton"
-                onclick="toggleAccount()"
-            >
+        <button id="accountButton" onclick="toggleAccount()">
             🔐 Anmelden
+        </button>
+
+        <div id="accountMenu" class="account-menu" style="display: none;">
+
+            <h3>👤 Mein Account</h3>
+
+            <p id="accountEmail">
+                Nicht angemeldet
+            </p>
+
+            <button onclick="abmelden()">
+                🚪 Abmelden
             </button>
 
-            <div
-                id="accountMenu"
-                class="account-menu"
-                style="display: none;"
-            >
-
-                <h3>👤 Mein Account</h3>
-
-                <p id="accountEmail">
-                    Nicht angemeldet
-                </p>
-
-                <button onclick="abmelden()">
-                    🚪 Abmelden
-                </button>
-
-            </div>
-
         </div>
-
-    </header>
-
-    <div class="container">
-
-        <h1>🎓 LearnClass</h1>
-
-        <p>
-            Lernen. Gemeinsam. Einfach.
-        </p>
-
-        <button onclick="window.location.href='login.html'">
-            🔐 Anmelden
-        </button>
-
-        <button>
-            🏫 Klasse erstellen
-        </button>
-
-        <button>
-            📚 Klasse beitreten
-        </button>
 
     </div>
 
-    <script>
-    const email = localStorage.getItem("learnclassNickname");
+</header>
 
-    if (email) {
-        const info = document.createElement("div");
 
-        info.innerHTML = `
-           <p>✅ Angemeldet als: <b>${email}</b></p>
-           <button onclick="abmelden()">🚪 Abmelden</button>
-        `;
+<div class="container">
 
-        info.className = "account-info";
-        document.body.prepend(info);
+    <h1>🎓 LearnClass</h1>
+
+    <p>
+        Lernen. Gemeinsam. Einfach.
+    </p>
+
+    <button onclick="window.location.href='login.html'">
+        🔐 Anmelden
+    </button>
+
+    <button onclick="oeffneKlassenOverlay('create')">
+        🏫 Klasse erstellen
+    </button>
+
+    <button onclick="oeffneKlassenOverlay('join')">
+        📚 Klasse beitreten
+    </button>
+
+    <h2>📚 Meine Klassen</h2>
+
+    <div id="klassenListe">
+        <p>Du bist noch keiner Klasse beigetreten.</p>
+    </div>
+
+</div>
+
+
+<!-- Klassen-Overlay -->
+
+<div id="klassenOverlay" class="overlay" style="display: none;">
+
+    <div class="overlay-box">
+
+        <button class="close-button" onclick="schliesseKlassenOverlay()">
+            ✖
+        </button>
+
+        <h2 id="overlayTitel">
+            🏫 Klasse erstellen
+        </h2>
+
+        <div id="createBereich">
+
+            <input
+                type="text"
+                id="klassenName"
+                placeholder="Name der Klasse"
+                maxlength="50"
+            >
+
+            <button onclick="klasseErstellen()">
+                ✅ Klasse erstellen
+            </button>
+
+        </div>
+
+        <div id="joinBereich" style="display: none;">
+
+            <input
+                type="text"
+                id="klassenCode"
+                placeholder="Klassencode eingeben"
+                maxlength="6"
+            >
+
+            <button onclick="klasseBeitreten()">
+                🚀 Beitreten
+            </button>
+
+        </div>
+
+        <p id="klassenMeldung"></p>
+
+    </div>
+
+</div>
+
+
+<script>
+
+const email = localStorage.getItem("learnclassEmail");
+const nickname = localStorage.getItem("learnclassNickname");
+
+
+// Account anzeigen
+
+if (email && nickname) {
+
+    document.getElementById("accountButton").innerText =
+        "👤 " + nickname;
+
+    document.getElementById("accountEmail").innerText =
+        "Du bist mit " + nickname + " angemeldet";
+
+    ladeKlassen();
+
+}
+
+
+// Account-Menü öffnen/schließen
+
+function toggleAccount() {
+
+    const menu = document.getElementById("accountMenu");
+
+    if (menu.style.display === "none") {
+        menu.style.display = "block";
+    } else {
+        menu.style.display = "none";
     }
 
-    function abmelden() {
-        localStorage.removeItem("learnclassNickname");
-        window.location.href = "index.html";
+}
+
+
+// Abmelden
+
+function abmelden() {
+
+    localStorage.removeItem("learnclassNickname");
+    localStorage.removeItem("learnclassEmail");
+
+    window.location.href = "index.html";
+
+}
+
+
+// Overlay öffnen
+
+function oeffneKlassenOverlay(art) {
+
+    if (!email) {
+
+        alert("Bitte melde dich zuerst an!");
+
+        window.location.href = "login.html";
+
+        return;
+
     }
-    </script>
+
+    document.getElementById("klassenOverlay").style.display = "flex";
+
+    document.getElementById("klassenMeldung").innerText = "";
+
+    if (art === "create") {
+
+        document.getElementById("overlayTitel").innerText =
+            "🏫 Klasse erstellen";
+
+        document.getElementById("createBereich").style.display = "block";
+        document.getElementById("joinBereich").style.display = "none";
+
+    } else {
+
+        document.getElementById("overlayTitel").innerText =
+            "📚 Klasse beitreten";
+
+        document.getElementById("createBereich").style.display = "none";
+        document.getElementById("joinBereich").style.display = "block";
+
+    }
+
+}
+
+
+// Overlay schließen
+
+function schliesseKlassenOverlay() {
+
+    document.getElementById("klassenOverlay").style.display = "none";
+
+}
+
+
+// Klasse erstellen
+
+async function klasseErstellen() {
+
+    const name = document.getElementById("klassenName").value.trim();
+    const meldung = document.getElementById("klassenMeldung");
+
+    if (!name) {
+
+        meldung.innerText = "❌ Bitte gib einen Klassennamen ein.";
+
+        return;
+
+    }
+
+    try {
+
+        const antwort = await fetch("/classes/create", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                name: name,
+                email: email
+            })
+
+        });
+
+        const daten = await antwort.json();
+
+        if (!antwort.ok) {
+
+            meldung.innerText = "❌ " + daten.message;
+
+            return;
+
+        }
+
+        meldung.innerText =
+            "✅ Klasse erstellt! Code: " + daten.class.code;
+
+        document.getElementById("klassenName").value = "";
+
+        ladeKlassen();
+
+    } catch (error) {
+
+        meldung.innerText =
+            "❌ Server nicht erreichbar.";
+
+    }
+
+}
+
+
+// Klasse beitreten
+
+async function klasseBeitreten() {
+
+    const code = document.getElementById("klassenCode").value.trim().toUpperCase();
+    const meldung = document.getElementById("klassenMeldung");
+
+    if (!code) {
+
+        meldung.innerText = "❌ Bitte gib einen Klassencode ein.";
+
+        return;
+
+    }
+
+    try {
+
+        const antwort = await fetch("/classes/join", {
+
+            method: "POST",
+
+            headers: {
+                "Content-Type": "application/json"
+            },
+
+            body: JSON.stringify({
+                code: code,
+                email: email
+            })
+
+        });
+
+        const daten = await antwort.json();
+
+        if (!antwort.ok) {
+
+            meldung.innerText = "❌ " + daten.message;
+
+            return;
+
+        }
+
+        meldung.innerText =
+            "🎉 Du bist der Klasse beigetreten!";
+
+        document.getElementById("klassenCode").value = "";
+
+        ladeKlassen();
+
+    } catch (error) {
+
+        meldung.innerText =
+            "❌ Server nicht erreichbar.";
+
+    }
+
+}
+
+
+// Klassen laden
+
+async function ladeKlassen() {
+
+    if (!email) {
+        return;
+    }
+
+    try {
+
+        const antwort = await fetch(
+            "/classes/" + encodeURIComponent(email)
+        );
+
+        const klassen = await antwort.json();
+
+        const liste = document.getElementById("klassenListe");
+
+        if (klassen.length === 0) {
+
+            liste.innerHTML =
+                "<p>Du bist noch keiner Klasse beigetreten.</p>";
+
+            return;
+
+        }
+
+        liste.innerHTML = "";
+
+        klassen.forEach(klasse => {
+
+            const karte = document.createElement("div");
+
+            karte.className = "klassen-karte";
+
+            karte.innerHTML = `
+                <h3>🏫 ${klasse.name}</h3>
+                <p>Code: <b>${klasse.code}</b></p>
+                <button onclick="alert('Klassenbereich kommt bald!')">
+                    📖 Klasse öffnen
+                </button>
+            `;
+
+            liste.appendChild(karte);
+
+        });
+
+    } catch (error) {
+
+        document.getElementById("klassenListe").innerText =
+            "❌ Klassen konnten nicht geladen werden.";
+
+    }
+
+}
+
+</script>
 
 </body>
-
 </html>
