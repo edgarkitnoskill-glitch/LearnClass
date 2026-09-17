@@ -297,3 +297,21 @@ h2 {
     color: white;
     cursor: pointer;
 }
+
+/* Kreuz unter der Überschrift */
+.overlay-box .close-button {
+    position: static;
+    display: block;
+    margin: 15px auto 0;
+    border: none;
+    background: #eeeeee;
+    color: #333333;
+    font-size: 18px;
+    padding: 8px 18px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.overlay-box .close-button:hover {
+    background: #dddddd;
+}
