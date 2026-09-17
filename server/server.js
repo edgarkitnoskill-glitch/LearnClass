@@ -5,8 +5,6 @@ const sqlite3 = require("sqlite3").verbose();
 
 const app = express();
 
-const PORT = 3000;
-
 // Datenbank öffnen
 const db = new sqlite3.Database("./learnclass.db");
 
@@ -169,10 +167,8 @@ app.post("/login", (req, res) => {
 });
 
 // Server starten
+const PORT = process.env.PORT || 3000;
+
 app.listen(PORT, () => {
-
-    console.log(
-        `LearnClass läuft auf http://localhost:${PORT}`
-    );
-
+    console.log(`LearnClass läuft auf Port ${PORT}`);
 });
