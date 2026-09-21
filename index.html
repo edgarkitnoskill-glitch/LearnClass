@@ -17,7 +17,7 @@
 
     <div class="account-area">
 
-        <button id="accountButton" onclick="toggleAccount()">
+        <button id="accountButton" onclick="window.location.href='login.html'">
             🔐 Anmelden
         </button>
 
@@ -34,6 +34,10 @@
             </button>
 
         </div>
+
+        <button id="signinButton" onclick="window.location.href='anmelden.html'">
+            🔑 Registrieren
+        </button>
 
     </div>
 
@@ -52,12 +56,8 @@
         🔐 Anmelden
     </button>
 
-    <button onclick="oeffneKlassenOverlay('create')">
-        🏫 Klasse erstellen
-    </button>
-
-    <button onclick="oeffneKlassenOverlay('join')">
-        📚 Klasse beitreten
+    <button onclick="window.location.href='klassen.html'">
+        📚 Meine Klassen
     </button>
 
     <h2>📚 Meine Klassen</h2>
@@ -67,62 +67,6 @@
     </div>
 
 </div>
-
-
-<!-- Klassen-Overlay -->
-
-<div id="klassenOverlay" class="overlay" style="display: none;">
-
-    <div class="overlay-box">
-
-        <h2 id="overlayTitel">
-            🏫 Klasse erstellen
-        </h2>
-
-        <div id="createBereich">
-
-            <input
-                type="text"
-                id="klassenName"
-                placeholder="Name der Klasse"
-                maxlength="50"
-            >
-
-            <button onclick="klasseErstellen()">
-                ✅ Klasse erstellen
-            </button>
-
-            <button class="close-button" onclick="schliesseKlassenOverlay()">
-                ✖ Schließen
-            </button>
-
-        </div>
-
-        <div id="joinBereich" style="display: none;">
-
-            <input
-                type="text"
-                id="klassenCode"
-                placeholder="Klassencode eingeben"
-                maxlength="6"
-            >
-
-            <button onclick="klasseBeitreten()">
-                🚀 Beitreten
-            </button>
-
-            <button class="close-button" onclick="schliesseKlassenOverlay()">
-                ✖ Schließen
-            </button>
-
-        </div>
-
-        <p id="klassenMeldung"></p>
-
-    </div>
-
-</div>
-
 
 <script>
 
@@ -159,6 +103,11 @@ function toggleAccount() {
 
 }
 
+// Registrieren ausblenden, wenn angemeldet
+
+if (email && nickname) {
+    document.getElementById("signinButton").style.display = "none";
+}
 
 // Abmelden
 
