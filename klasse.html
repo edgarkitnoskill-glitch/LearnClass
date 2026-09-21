@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnClass - Klasse</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="navbar">
+
+        <div class="logo">
+            🎓 LearnClass
+        </div>
+
+        <div class="account-area">
+
+            <button id="accountButton" onclick="toggleAccount()">
+                🔐 Account
+            </button>
+
+            <div id="accountMenu" class="account-menu" style="display: none;">
+
+                <h3>👤 Mein Account</h3>
+
+                <p id="accountEmail">
+                    Nicht angemeldet
+                </p>
+
+                <button onclick="abmelden()">
+                    🚪 Abmelden
+                </button>
+
+                <button onclick="window.location.href='anmelden.html'">
+                    🔑 Anmelden
+                </button>
+
+            </div>
+
+        </div>
+
+    </header>
+    <script>
+        const email = localStorage.getItem("learnclassEmail");
+        const nickname = localStorage.getItem("learnclassNickname");
+
+
+        // Account anzeigen
+
+        if (email && nickname) {
+
+            document.getElementById("accountButton").innerText =
+                "👤 " + nickname;
+
+            document.getElementById("accountEmail").innerText =
+                "Du bist mit " + nickname + " angemeldet";
+
+        }
+
+        // Account-Menü öffnen/schließen
+
+        function toggleAccount() {
+
+            const menu = document.getElementById("accountMenu");
+
+            if (menu.style.display === "none") {
+                menu.style.display = "block";
+            } else {
+                menu.style.display = "none";
+            }
+
+        }
+
+        // Abmelden
+
+        function abmelden() {
+            
+            alert("Du wurdest abgemeldet.");
+            localStorage.removeItem("learnclassNickname");
+            localStorage.removeItem("learnclassEmail");
+
+            window.location.href = "index.html";
+
+        }
+    </script>
+</body>
+</html>

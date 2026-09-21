@@ -1,0 +1,250 @@
+﻿<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meine Klassen - LearnClass</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f1f5f9;
+      margin: 0;
+      padding: 30px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #1e293b;
+    }
+
+    .box {
+      max-width: 600px;
+      margin: 20px auto;
+      background: white;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px #0002;
+    }
+
+    input,
+    button {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px;
+      margin-top: 10px;
+      border-radius: 8px;
+      border: 1px solid #cbd5e1;
+      font-size: 16px;
+    }
+
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #1d4ed8;
+    }
+
+    .oeffnen {
+      background: #16a34a;
+    }
+
+    .oeffnen:hover {
+      background: #15803d;
+    }
+
+    .fehler {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>Meine Klassen</h1>
+
+  <div class="box">
+    <h2>Neue Klasse erstellen</h2>
+
+    <input
+      type="text"
+      id="klassenName"
+      placeholder="Name der Klasse"
+    >
+
+    <button onclick="klasseErstellen()">
+      Klasse erstellen
+    </button>
+  </div>
+
+  <div class="box">
+    <h2>Klasse beitreten</h2>
+
+    <input
+      type="text"
+      id="beitrittsCode"
+      placeholder="Klassen-Code"
+    >
+
+    <button onclick="klasseBeitreten()">
+      Beitreten
+    </button>
+  </div>
+
+  <div class="box">
+    <h2>Meine Klassen</h2>
+
+    <div id="klassenListe">
+      Klassen werden geladen...
+    </div>
+  </div>
+
+  <script>
+    const email = localStorage.getItem("learnclassEmail");
+
+    if (!email) {
+      alert("Bitte zuerst einloggen.");
+      window.location.href = "login.html";
+    }
+
+    async function klassenLaden() {
+      const liste = document.getElementById("klassenListe");
+
+      try {
+        const antwort = await fetch(
+          "/classes/by-email/" + encodeURIComponent(email)
+        );
+
+        if (!antwort.ok) {
+          throw new Error("Klassen konnten nicht geladen werden.");
+        }
+
+        const klassen = await antwort.json();
+
+        liste.innerHTML = "";
+
+        if (klassen.length === 0) {
+          liste.innerHTML = "<p>Du bist noch in keiner Klasse.</p>";
+          return;
+        }
+
+        klassen.forEach(klasse => {
+          const div = document.createElement("div");
+          div.className = "klasse";
+
+          div.innerHTML = `
+            <h3>${klasse.name}</h3>
+            <p><b>Code:</b> ${klasse.code}</p>
+            <p><b>Deine Rolle:</b> ${klasse.role || "Schüler"}</p>
+
+            <button
+              class="oeffnen"
+              onclick="klasseOeffnen(${klasse.id})"
+            >
+              Klasse öffnen
+            </button>
+          `;
+
+          liste.appendChild(div);
+        });
+      } catch (fehler) {
+        console.error(fehler);
+        liste.innerHTML = `
+          <p class="fehler">
+            Fehler beim Laden der Klassen.
+          </p>
+        `;
+      }
+    }
+
+    function klasseOeffnen(id) {
+      window.location.href = "klasse.html?id=" + id;
+    }
+
+    async function klasseErstellen() {
+      const name = document.getElementById("klassenName").value.trim();
+
+      if (!name) {
+        alert("Bitte gib einen Klassennamen ein.");
+        return;
+      }
+
+      try {
+        const antwort = await fetch("/classes/create", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            name: name,
+            email: email
+          })
+        });
+
+        const daten = await antwort.json();
+
+        if (!antwort.ok) {
+          alert(daten.error || "Fehler beim Erstellen.");
+          return;
+        }
+
+        alert("Klasse erfolgreich erstellt!");
+
+        document.getElementById("klassenName").value = "";
+
+        klassenLaden();
+      } catch (fehler) {
+        console.error(fehler);
+        alert("Serverfehler beim Erstellen.");
+      }
+    }
+
+    async function klasseBeitreten() {
+      const code = document
+        .getElementById("beitrittsCode")
+        .value
+        .trim();
+
+      if (!code) {
+        alert("Bitte gib einen Klassen-Code ein.");
+        return;
+      }
+
+      try {
+        const antwort = await fetch("/classes/join", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            code: code,
+            email: email
+          })
+        });
+
+        const daten = await antwort.json();
+
+        if (!antwort.ok) {
+          alert(daten.error || "Fehler beim Beitreten.");
+          return;
+        }
+
+        alert("Du bist der Klasse beigetreten!");
+
+        document.getElementById("beitrittsCode").value = "";
+
+        klassenLaden();
+      } catch (fehler) {
+        console.error(fehler);
+        alert("Serverfehler beim Beitreten.");
+      }
+    }
+
+    klassenLaden();
+  </script>
+</body>
+</html>
